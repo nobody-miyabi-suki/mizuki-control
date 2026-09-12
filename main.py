@@ -28,3 +28,9 @@ def system():
 def anime():
     print("oni san")
     return "Python DaiSuki"
+@app.get("/cpu")
+def cpu():
+    return {
+        "cores": psutil.cpu_count(),
+        "usage": psutil.cpu_percent()
+    }

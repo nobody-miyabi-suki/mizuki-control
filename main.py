@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse
 from fastapi import FastAPI
 import platform
 import psutil
@@ -34,3 +35,6 @@ def cpu():
         "cores": psutil.cpu_count(),
         "usage": psutil.cpu_percent()
     }
+@app.get("/ui")
+def ui():
+    return FileResponse("ui/index.html")

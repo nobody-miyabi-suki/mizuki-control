@@ -1,4 +1,8 @@
 from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+import asyncio
+from pydantic import BaseModel
+import json
 from fastapi import FastAPI
 import platform
 import psutil
@@ -38,3 +42,34 @@ def cpu():
 @app.get("/ui")
 def ui():
     return FileResponse("ui/index.html")
+
+@app.get("/event")
+async def event():
+    async def generate():
+        while True:
+            data = {
+                "cpu": psutil.cpu_percent(),
+                "ram": psutil.virtual_memory().percent
+            }
+
+            yield f"data: {json.dumps(data)}\n\n"
+
+            await asyncio.sleep(1)
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream"
+    )
+
+class Command(BaseModel):
+    command: str
+
+
+@app.post("/command")
+def command(data: Command):
+    print(f"Command received: {data.command}")
+
+    return {
+        "status": "ok",
+        "command": data.command
+    }

@@ -28,10 +28,28 @@
         }
     </style>
 </head>
+<script>
+    const events = new EventSource("/event");
 
+    events.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        document.getElementById("cpu").textContent = data.cpu;
+        document.getElementById("ram").textContent = data.ram;
+    };
+
+    events.onerror = () => {
+        console.log("Connection to Mizuki event stream lost.");
+    };
+</script>
 <body>
     <h1>Mizuki Control</h1>
     <p>FastAPI HTML test page</p>
+
+    <h2>System Monitor</h2>
+
+    <p>CPU: <span id="cpu">-</span>%</p>
+    <p>RAM: <span id="ram">-</span>%</p>
 
     <button onclick="alert('Mizuki says hello!')">
         Click me
